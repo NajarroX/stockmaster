@@ -1,0 +1,903 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="page-title">Catálogo Oficial — Najarro X Estudio</title>
+  
+  <!-- Google Fonts: Lexend 400 (Regular) y 800 (ExtraBold) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Lexend:wght@400;800&display=swap" rel="stylesheet">
+  
+  <!-- Tailwind CSS & Lucide Icons -->
+  <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
+  
+  <style>
+    :root {
+      --bg-main: #090d16;
+      --bg-card: #0f172a;
+      --bg-input: #1e293b;
+      --border-color: #1e293b;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --accent-color: #D60006; /* Rojo Corporativo */
+      --secondary-color: #0086D6; /* Azul Corporativo */
+    }
+
+    body.light-mode {
+      --bg-main: #f8fafc;
+      --bg-card: #ffffff;
+      --bg-input: #f1f5f9;
+      --border-color: #e2e8f0;
+      --text-main: #0f172a;
+      --text-muted: #64748b;
+      --accent-color: #D60006;
+      --secondary-color: #0086D6;
+    }
+
+    /* Tipografía Lexend obligatoria para todo el ecosistema */
+    body {
+      font-family: 'Lexend', sans-serif;
+      font-weight: 400;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      transition: background-color 0.3s ease, color 0.3s ease;
+    }
+    
+    h1, h2, h3, h4, h5, h6, th, .font-heading {
+      font-weight: 800 !important;
+    }
+
+    .bento-card {
+      background-color: var(--bg-card);
+      border-color: var(--border-color);
+      transition: background-color 0.3s ease, border-color 0.3s ease;
+    }
+    .bento-input {
+      background-color: var(--bg-input);
+      border-color: var(--border-color);
+      color: var(--text-main);
+    }
+    .text-muted-custom { color: var(--text-muted); }
+    
+    /* Loader de interacción */
+    #global-loader { 
+      display: none; 
+      position: fixed; 
+      inset: 0; 
+      background: rgba(9, 13, 22, 0.85); 
+      z-index: 9999; 
+      justify-content: center; 
+      align-items: center; 
+    }
+    .spinner { 
+      width: 45px; 
+      height: 45px; 
+      border: 4px solid #1e293b; 
+      border-top: 4px solid var(--accent-color); 
+      border-radius: 50%; 
+      animation: spin 0.8s linear infinite; 
+    }
+    @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+
+    /* ========================================== */
+    /* 🖨️ ESTILOS EXCLUSIVOS PARA IMPRESIÓN (PDF) */
+    /* ========================================== */
+    @media print {
+      body {
+        background: #ffffff !important;
+        color: #0f172a !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
+      }
+      /* Ocultar toda la interfaz interactiva de la web */
+      header, main, footer, #mobile-quote-bar, #desktop-quote-indicator, #quote-modal, #global-loader {
+        display: none !important;
+      }
+      /* Mostrar el área limpia de cotización formal */
+      #invoice-print-area {
+        display: block !important;
+      }
+    }
+
+    /* ========================================== */
+    /* 🖥️ INDICADOR DE ESCRITORIO (NUEVO)        */
+    /* ========================================== */
+    #desktop-quote-indicator {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 45;
+      background: var(--accent-color);
+      color: white;
+      padding: 12px 20px;
+      border-radius: 48px;
+      box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.3), 0 8px 10px -6px rgba(0, 0, 0, 0.2);
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+      transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      font-family: 'Lexend', sans-serif;
+      border: none;
+      backdrop-filter: blur(4px);
+    }
+    
+    #desktop-quote-indicator:hover {
+      transform: scale(1.05);
+      box-shadow: 0 20px 30px -10px rgba(214, 0, 6, 0.4);
+    }
+    
+    #desktop-quote-indicator:active {
+      transform: scale(0.98);
+    }
+    
+    #desktop-quote-indicator .indicator-icon {
+      background: rgba(255, 255, 255, 0.2);
+      border-radius: 50%;
+      padding: 6px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    
+    #desktop-quote-indicator .indicator-text {
+      font-size: 13px;
+      font-weight: 700;
+      letter-spacing: 0.03em;
+      text-transform: uppercase;
+    }
+    
+    #desktop-quote-indicator .indicator-count {
+      background: white;
+      color: var(--accent-color);
+      border-radius: 40px;
+      padding: 2px 10px;
+      font-size: 16px;
+      font-weight: 800;
+      font-family: monospace;
+      min-width: 32px;
+      text-align: center;
+      transition: all 0.2s ease;
+    }
+    
+    /* Ocultar indicador de escritorio en móviles */
+    @media (max-width: 768px) {
+      #desktop-quote-indicator {
+        display: none !important;
+      }
+    }
+    
+    /* Mostrar indicador de escritorio solo en desktop */
+    @media (min-width: 769px) {
+      #desktop-quote-indicator {
+        display: flex !important;
+      }
+    }
+  </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col pb-24 md:pb-6">
+
+  <!-- LOADER -->
+  <div id="global-loader">
+    <div class="text-center space-y-3">
+      <div class="spinner mx-auto"></div>
+      <p class="text-xs font-mono tracking-widest text-muted-custom uppercase">Sincronizando con Google Sheets...</p>
+    </div>
+  </div>
+
+  <!-- ENCABEZADO (HEADER) -->
+  <header class="bento-card border-b sticky top-0 z-40 backdrop-blur-md bg-opacity-85 px-4 py-4 sm:px-6 shadow-sm">
+    <div class="max-w-7xl mx-auto flex flex-col sm:flex-row justify-between items-center gap-4">
+      
+      <!-- Logotipo de 100px de alto y sin marcos contenedor -->
+      <div class="flex items-center gap-4 w-full sm:w-auto justify-center sm:justify-start">
+        <img id="store-logo" src="images/logo.png" alt="Najarro X Estudio" class="h-[100px] w-auto object-contain block filter drop-shadow-sm">
+        <div class="text-center sm:text-left">
+          <h1 class="text-xl tracking-tight uppercase">MI CATALOGO</h1>
+          <p class="text-xs text-muted-custom font-medium tracking-widest mt-0.5 uppercase">por Najarro X Estudio</p>
+        </div>
+      </div>
+
+      <!-- Filtros Rápidos Inyectados -->
+      <div id="header-categories" class="flex flex-wrap gap-1.5 justify-center"></div>
+
+      <!-- Controles: Ajustes Pop-up e Interruptor de Color -->
+      <div class="flex items-center gap-4 shrink-0">
+        
+        <!-- Botón de Acción Principal: Cotizar (CTA Añadido) -->
+        <button onclick="toggleQuoteModal(true)" class="bento-input border px-4 py-2.5 rounded-xl flex items-center justify-center gap-2 cursor-pointer hover:bg-slate-700/20 transition-all text-muted-custom text-xs font-heading tracking-wider uppercase" title="Configurar Cotización">
+          <i data-lucide="settings" class="w-4 h-4 transition-transform duration-500 hover:rotate-90"></i>
+          <span>Cotizar</span>
+        </button>
+
+        <!-- Toggle Modo Día / Noche -->
+        <div class="flex items-center gap-2">
+          <span class="text-xs font-semibold text-muted-custom flex items-center gap-1">
+            <i data-lucide="sun" class="w-3.5 h-3.5"></i>/<i data-lucide="moon" class="w-3.5 h-3.5"></i>
+          </span>
+          <button onclick="toggleThemeMode()" class="w-11 h-6 bg-slate-700 rounded-full p-1 transition-colors duration-300 relative focus:outline-none cursor-pointer">
+            <div id="theme-toggle-dot" class="bg-white w-4 h-4 rounded-full shadow-md transform transition-transform duration-300"></div>
+          </button>
+        </div>
+
+      </div>
+    </div>
+  </header>
+
+  <!-- SECCIÓN CENTRAL DE CONTENIDO -->
+  <main class="flex-grow max-w-7xl w-full mx-auto p-4 sm:p-6 space-y-6">
+    
+    <!-- CONTROLES DE BÚSQUEDA Y FILTRADO AVANZADO -->
+    <div class="bento-card border p-4 rounded-2xl flex flex-col md:flex-row gap-4 items-center justify-between shadow-xs">
+      <div class="relative w-full md:w-96">
+        <i data-lucide="search" class="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-custom"></i>
+        <input type="text" id="store-search" oninput="filterStoreCatalog()" placeholder="Buscar solución por nombre o SKU..." class="bento-input border w-full pl-10 pr-4 py-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[var(--secondary-color)]">
+      </div>
+      <div class="flex flex-wrap items-center gap-3 w-full md:w-auto justify-end">
+        <select id="store-filter-category" onchange="filterStoreCatalog()" class="bento-input border px-3 py-2.5 rounded-xl text-sm focus:outline-none cursor-pointer">
+          <option value="">Todas las Categorías</option>
+        </select>
+        <select id="store-filter-stock" onchange="filterStoreCatalog()" class="bento-input border px-3 py-2.5 rounded-xl text-sm focus:outline-none cursor-pointer">
+          <option value="all">Todas las existencias</option>
+          <option value="in_stock">Disponibilidad Inmediata</option>
+          <option value="low_stock">Últimas Unidades (Stock Crítico)</option>
+        </select>
+      </div>
+    </div>
+
+    <!-- REJILLA EXTENDIDA DE PRODUCTOS (RESPONSIVE OPTIMIZADO) -->
+    <div class="w-full">
+      <div id="store-grid" class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 xl:grid-cols-4 gap-4">
+        <!-- Las tarjetas se auto-generan aquí -->
+      </div>
+    </div>
+
+  </main>
+
+  <!-- ========================================== -->
+  <!-- 🖥️ INDICADOR DE ESCRITORIO (NUEVO)        -->
+  <!-- ========================================== -->
+  <div id="desktop-quote-indicator" onclick="toggleQuoteModal(true)">
+    <div class="indicator-icon">
+      <i data-lucide="shopping-cart" class="w-5 h-5"></i>
+    </div>
+    <span class="indicator-text">Mi Cotización</span>
+    <span id="desktop-items-count" class="indicator-count">0</span>
+  </div>
+
+  <!-- ========================================== -->
+  <!-- 🎴 VENTANA EMERGENTE POP-UP (MODAL)        -->
+  <!-- ========================================== -->
+  <div id="quote-modal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/75 backdrop-blur-sm hidden opacity-0 transition-all duration-300" onclick="toggleQuoteModal(false)">
+    <div class="bento-card border p-6 rounded-2xl shadow-2xl w-full max-w-lg max-h-[85vh] overflow-y-auto relative space-y-5 transform scale-95 transition-transform duration-300" onclick="event.stopPropagation()">
+      
+      <!-- Botón de Salida -->
+      <button onclick="toggleQuoteModal(false)" class="absolute top-4 right-4 text-muted-custom hover:text-[var(--accent-color)] p-1 rounded-lg hover:bg-slate-700/20 cursor-pointer transition-colors">
+        <i data-lucide="x" class="w-5 h-5"></i>
+      </button>
+
+      <!-- Encabezado Modal -->
+      <div class="flex items-center gap-2.5 border-b pb-3 border-slate-700/20">
+        <i data-lucide="file-text" class="w-5 h-5 text-[var(--secondary-color)]"></i>
+        <h3 class="text-base tracking-tight uppercase font-heading">Configurar Cotización</h3>
+      </div>
+
+      <!-- Datos del Solicitante -->
+      <div class="space-y-3">
+        <div>
+          <label class="block text-[11px] font-bold mb-1 text-muted-custom uppercase tracking-wider">Nombre del Cliente / Empresa <span class="text-[var(--accent-color)]">*</span></label>
+          <input type="text" id="quote-client-name" required placeholder="Ej. Juan Pérez / Agencia Global" class="bento-input border w-full p-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[var(--secondary-color)]">
+        </div>
+        <div>
+          <label class="block text-[11px] font-bold mb-1 text-muted-custom uppercase tracking-wider">Correo de Destino <span class="text-[var(--accent-color)]">*</span></label>
+          <input type="email" id="quote-client-email" required placeholder="correo@cliente.com" class="bento-input border w-full p-2.5 rounded-xl text-sm focus:outline-none focus:ring-1 focus:ring-[var(--secondary-color)]">
+        </div>
+      </div>
+
+      <!-- Lista Detallada de Compras -->
+      <div class="border-t border-b py-3 border-slate-700/20">
+        <p class="text-[11px] font-bold text-muted-custom uppercase tracking-wider mb-2">Desglose Seleccionado</p>
+        <div id="quote-items-list" class="space-y-2 max-h-[160px] overflow-y-auto pr-1">
+          <!-- Dinámico -->
+        </div>
+      </div>
+
+      <!-- Totales -->
+      <div class="space-y-1.5 text-xs font-medium">
+        <div class="flex justify-between text-muted-custom">
+          <span>Subtotal:</span>
+          <span id="calc-subtotal" class="font-mono">$0.00</span>
+        </div>
+        <div class="flex justify-between text-muted-custom">
+          <span>Impuesto / ITBMS (7%):</span>
+          <span id="calc-tax" class="font-mono">$0.00</span>
+        </div>
+        <div class="flex justify-between text-sm font-heading border-t border-slate-700/20 pt-2 text-[var(--accent-color)]">
+          <span>Total Estimado:</span>
+          <span id="calc-total" class="font-bold text-base font-mono">$0.00</span>
+        </div>
+      </div>
+
+      <!-- Acciones de Procesamiento -->
+      <div class="grid grid-cols-2 gap-3 pt-1">
+        <button onclick="processPrintQuote()" class="w-full border border-slate-600/40 hover:bg-slate-700/20 py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer text-muted-custom hover:text-white">
+          <i data-lucide="printer" class="w-4 h-4"></i> PDF / Imprimir
+        </button>
+        <button onclick="sendQuoteByEmail()" class="w-full bg-[var(--accent-color)] hover:bg-[#b00005] text-white py-2.5 rounded-xl text-xs font-bold uppercase tracking-wider transition-all flex items-center justify-center gap-1.5 cursor-pointer shadow-md">
+          <i data-lucide="send" class="w-4 h-4"></i> Despachar Email
+        </button>
+      </div>
+
+      <button onclick="clearQuote()" class="w-full text-center text-[11px] text-rose-400 hover:underline transition-colors block pt-1 cursor-pointer">
+        Limpiar toda la lista
+      </button>
+
+    </div>
+  </div>
+
+  <!-- WIDGET NOTIFICADOR INFERIOR MÓVIL (ORIGINAL SIN MODIFICAR) -->
+  <div id="mobile-quote-bar" class="fixed bottom-4 left-4 right-4 z-40 bg-[var(--accent-color)] text-white p-4 rounded-xl shadow-2xl flex items-center justify-between md:hidden transition-all duration-300 transform translate-y-24">
+    <div>
+      <p class="text-[10px] opacity-80 uppercase font-bold tracking-wider">Tu Presupuesto</p>
+      <p class="text-sm font-heading"><span id="mobile-items-count">0</span> artículos en lista</p>
+    </div>
+    <button onclick="toggleQuoteModal(true)" class="bg-white text-[var(--accent-color)] px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider shadow flex items-center gap-1 cursor-pointer hover:bg-slate-100 transition-all">
+      Ver Detalle <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+    </button>
+  </div>
+
+  <!-- PIE DE PÁGINA -->
+  <footer class="mt-auto py-6 text-center text-xs text-muted-custom border-t border-slate-800/10">
+    <p>&copy; 2026 <strong>Najarro X Estudio</strong>. Panel de Autogestión Comercial Corporativo.</p>
+  </footer>
+
+  <!-- CONTENEDOR EXCLUSIVO PARA RENDERIZADO DE INVOICE IMPRESO (SÓLO MEDIA PRINT) -->
+  <div id="invoice-print-area" class="hidden min-h-screen bg-white text-slate-900 p-10"></div>
+
+  <!-- SCRIPT CON LOGICA CORREGIDA -->
+  <script>
+    const API_URL = "https://script.google.com/macros/s/AKfycbxQjJ_d8xvf2UdD7Jfi1brVvlDXTKeqNTc5_dJDXlbpaVW8UKOSHD0h6tWp0z-wD50S3Q/exec";
+    
+    let dataLocal = { productos: [], categorias: [] };
+    let quoteItems = [];
+
+    window.addEventListener('DOMContentLoaded', () => {
+      loadSavedCustomization();
+      loadDataFromServer();
+    });
+
+    async function loadDataFromServer() {
+      showLoader();
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({ action: 'getData', payload: {} })
+        });
+        const res = await response.json();
+        
+        if (res.success && res.data) {
+          dataLocal.productos = res.data.productos || [];
+          dataLocal.categorias = res.data.categorias || [];
+          
+          renderCategoryFilters();
+          renderCatalogCards();
+        } else {
+          alert("Error al estructurar los datos del inventario remoto.");
+        }
+      } catch (err) {
+        console.error("Error crítico de conexión API con Apps Script:", err);
+        alert("Fallo de red al conectar con el servidor de Google Sheets.");
+      } finally {
+        hideLoader();
+      }
+    }
+
+    function showLoader() { document.getElementById('global-loader').style.display = 'flex'; }
+    function hideLoader() { document.getElementById('global-loader').style.display = 'none'; }
+
+    function renderCategoryFilters() {
+      const headerBox = document.getElementById('header-categories');
+      const selectBox = document.getElementById('store-filter-category');
+
+      let headerHtml = `<button onclick="filterByHeaderCategory('')" class="px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer border border-slate-700/20 bg-[var(--bg-input)] transition-all hover:scale-105">Todos</button>`;
+      let selectHtml = `<option value="">Todas las Categorías</option>`;
+
+      dataLocal.categorias.forEach(cat => {
+        headerHtml += `
+          <button onclick="filterByHeaderCategory('${cat.id}')" class="px-3 py-1.5 rounded-xl text-xs font-semibold cursor-pointer border border-slate-700/20 transition-all hover:scale-105 bg-[var(--bg-card)]" style="border-left: 3px solid ${cat.color || '#ccc'}">
+            ${cat.nombre}
+          </button>
+        `;
+        selectHtml += `<option value="${cat.id}">${cat.nombre}</option>`;
+      });
+
+      headerBox.innerHTML = headerHtml;
+      selectBox.innerHTML = selectHtml;
+    }
+
+    function filterByHeaderCategory(catId) {
+      document.getElementById('store-filter-category').value = catId;
+      filterStoreCatalog();
+    }
+
+    function renderCatalogCards() {
+      const grid = document.getElementById('store-grid');
+      if (dataLocal.productos.length === 0) {
+        grid.innerHTML = `<div class="col-span-full p-8 text-center text-muted-custom text-xs">No hay productos disponibles cargados en el sistema.</div>`;
+        return;
+      }
+
+      grid.innerHTML = dataLocal.productos.map(p => {
+        const cat = dataLocal.categorias.find(c => c.id === p.categoria_id);
+        const qtyInQuote = quoteItems.find(q => q.product_id === p.id)?.quantity || 0;
+        
+        let stockBadge = `<span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Disponible</span>`;
+        if (Number(p.stock) <= 0) {
+          stockBadge = `<span class="bg-rose-500/10 text-rose-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Agotado</span>`;
+        } else if (Number(p.stock) <= Number(p.min_stock)) {
+          stockBadge = `<span class="bg-amber-500/10 text-amber-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Últimas Unidades</span>`;
+        }
+
+        return `
+          <div class="bento-card border rounded-2xl p-4 flex flex-col justify-between hover:shadow-md hover:border-slate-500/30 transition-all group">
+            <div class="space-y-3">
+              <div class="relative aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-700/10">
+                <img src="${p.imagen_url || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400'}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-102 transition-transform duration-500">
+                <span class="absolute top-2 left-2 text-[9px] font-mono font-bold tracking-wider px-2 py-0.5 rounded text-white shadow-sm" style="background:${cat?.color || '#0086D6'}ee">
+                  ${cat?.nombre || 'Solución'}
+                </span>
+              </div>
+              <div>
+                <h4 class="text-sm font-heading line-clamp-2 group-hover:text-[var(--secondary-color)] transition-colors">${p.nombre}</h4>
+                <p class="text-[10px] text-muted-custom font-mono mt-0.5">SKU: ${p.sku}</p>
+              </div>
+            </div>
+            
+            <div class="mt-4 pt-3 border-t border-slate-700/10 flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-base font-black font-mono">$${Number(p.precio).toFixed(2)}</span>
+                <div>${stockBadge}</div>
+              </div>
+              
+              <div class="flex items-center gap-2 mt-1">
+                <button onclick="addToQuote('${p.id}', -1)" class="bento-input border w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold hover:bg-slate-700/20 cursor-pointer select-none">-</button>
+                <input type="number" value="${qtyInQuote}" min="0" max="${p.stock}" onchange="updateQuoteInput('${p.id}', this.value)" class="bento-input border w-full h-8 rounded-lg text-center text-xs font-mono font-bold focus:outline-none">
+                <button onclick="addToQuote('${p.id}', 1)" class="bento-input border w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold hover:bg-slate-700/20 cursor-pointer select-none" ${Number(p.stock) <= 0 ? 'disabled class="opacity-20"' : ''}>+</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function toggleQuoteModal(open = null) {
+      const modal = document.getElementById('quote-modal');
+      const isHidden = modal.classList.contains('hidden');
+      const targetOpen = open !== null ? open : isHidden;
+
+      if (targetOpen) {
+        modal.classList.remove('hidden');
+        setTimeout(() => {
+          modal.classList.remove('opacity-0');
+          modal.querySelector('.bento-card').classList.remove('scale-95');
+        }, 10);
+      } else {
+        modal.classList.add('opacity-0');
+        modal.querySelector('.bento-card').classList.add('scale-95');
+        setTimeout(() => modal.classList.add('hidden'), 300);
+      }
+    }
+
+    function addToQuote(productId, change) {
+      const prod = dataLocal.productos.find(p => p.id === productId);
+      if (!prod) return;
+
+      const targetIndex = quoteItems.findIndex(q => q.product_id === productId);
+      let currentQty = targetIndex > -1 ? quoteItems[targetIndex].quantity : 0;
+      let newQty = currentQty + change;
+
+      if (newQty > Number(prod.stock)) newQty = Number(prod.stock);
+      
+      if (newQty <= 0) {
+        if (targetIndex > -1) quoteItems.splice(targetIndex, 1);
+      } else {
+        if (targetIndex > -1) {
+          quoteItems[targetIndex].quantity = newQty;
+        } else {
+          quoteItems.push({ product_id: productId, quantity: newQty });
+        }
+      }
+      calculateQuoteTotals();
+    }
+
+    function updateQuoteInput(productId, value) {
+      const prod = dataLocal.productos.find(p => p.id === productId);
+      const validatedQty = Math.min(Math.max(parseInt(value) || 0, 0), prod ? Number(prod.stock) : 0);
+      const targetIndex = quoteItems.findIndex(q => q.product_id === productId);
+      
+      if (validatedQty <= 0) {
+        if (targetIndex > -1) quoteItems.splice(targetIndex, 1);
+      } else {
+        if (targetIndex > -1) {
+          quoteItems[targetIndex].quantity = validatedQty;
+        } else {
+          quoteItems.push({ product_id: productId, quantity: validatedQty });
+        }
+      }
+      calculateQuoteTotals();
+    }
+
+    function clearQuote() {
+      if (quoteItems.length === 0 || confirm("¿Proceder a limpiar y remover los elementos agregados?")) {
+        quoteItems = [];
+        calculateQuoteTotals();
+        toggleQuoteModal(false);
+      }
+    }
+
+    function calculateQuoteTotals() {
+      let subtotal = 0;
+      quoteItems.forEach(q => {
+        const prod = dataLocal.productos.find(p => p.id === q.product_id);
+        if (prod) subtotal += Number(prod.precio) * q.quantity;
+      });
+
+      const tax = subtotal * 0.07;
+      const total = subtotal + tax;
+
+      document.getElementById('calc-subtotal').innerText = `$${subtotal.toFixed(2)}`;
+      document.getElementById('calc-tax').innerText = `$${tax.toFixed(2)}`;
+      document.getElementById('calc-total').innerText = `$${total.toFixed(2)}`;
+      
+      const totalCount = quoteItems.reduce((acc, curr) => acc + curr.quantity, 0);
+      
+      // Actualizar contador móvil
+      document.getElementById('mobile-items-count').innerText = totalCount;
+      
+      // Actualizar contador de escritorio (NUEVO)
+      const desktopCountElement = document.getElementById('desktop-items-count');
+      if (desktopCountElement) {
+        desktopCountElement.innerText = totalCount;
+      }
+
+      // Mostrar/ocultar barra móvil
+      const mobBar = document.getElementById('mobile-quote-bar');
+      if (totalCount > 0) {
+        mobBar.classList.remove('translate-y-24');
+      } else {
+        mobBar.classList.add('translate-y-24');
+      }
+
+      renderQuoteSummaryList();
+      renderCatalogCards();
+    }
+
+    function renderQuoteSummaryList() {
+      const listContainer = document.getElementById('quote-items-list');
+      if (quoteItems.length === 0) {
+        listContainer.innerHTML = `<p class="text-xs text-muted-custom text-center py-5 italic">No has agregado soluciones comerciales todavía.</p>`;
+        return;
+      }
+
+      listContainer.innerHTML = quoteItems.map(q => {
+        const prod = dataLocal.productos.find(p => p.id === q.product_id);
+        if (!prod) return '';
+        return `
+          <div class="flex items-center justify-between gap-2 text-xs border-b border-slate-700/10 pb-2">
+            <div class="max-w-[70%]">
+              <p class="font-bold truncate">${prod.nombre}</p>
+              <p class="text-[10px] text-muted-custom font-mono">Cant: ${q.quantity} x $${Number(prod.precio).toFixed(2)}</p>
+            </div>
+            <span class="font-bold font-mono text-[var(--secondary-color)]">$${(Number(prod.precio) * q.quantity).toFixed(2)}</span>
+          </div>
+        `;
+      }).join('');
+    }
+
+    /* 🔢 GESTIÓN DE SERIAL CORRELATIVO PERSISTENTE */
+    function getNextSerial() {
+      let currentSerial = localStorage.getItem('najarro_quote_serial');
+      if (!currentSerial) {
+        currentSerial = 1001; // Número inicial base
+        localStorage.setItem('najarro_quote_serial', currentSerial);
+      }
+      return parseInt(currentSerial);
+    }
+
+    function incrementSerial() {
+      let currentSerial = getNextSerial();
+      localStorage.setItem('najarro_quote_serial', currentSerial + 1);
+    }
+
+    async function sendQuoteByEmail() {
+      const clientName = document.getElementById('quote-client-name').value.trim();
+      const clientEmail = document.getElementById('quote-client-email').value.trim();
+
+      // Validación estricta obligatoria
+      if (!clientName || !clientEmail) {
+        alert("Error: El Nombre del Cliente y el Correo de Destino son campos obligatorios.");
+        return;
+      }
+      if (quoteItems.length === 0) {
+        alert("Agrega al menos una solución del catálogo para cotizar.");
+        return;
+      }
+
+      showLoader();
+
+      const serialNum = getNextSerial();
+      const serialStr = `NXE-${serialNum}`;
+
+      const detailsArray = quoteItems.map(q => {
+        const prod = dataLocal.productos.find(p => p.id === q.product_id);
+        return {
+          sku: prod?.sku || 'N/A',
+          nombre: prod?.nombre || 'Producto',
+          precio: Number(prod?.precio || 0),
+          cantidad: q.quantity,
+          total_item: Number(prod?.precio || 0) * q.quantity
+        };
+      });
+
+      try {
+        const response = await fetch(API_URL, {
+          method: 'POST',
+          body: JSON.stringify({
+            action: 'sendQuote',
+            payload: {
+              cliente_nombre: clientName,
+              cliente_email: clientEmail,
+              cotizacion_serial: serialStr,
+              items: detailsArray
+            }
+          })
+        });
+
+        const res = await response.json();
+        if (res.success) {
+          alert(`¡Orden ${serialStr} procesada con éxito! Remitida a: ${clientEmail}`);
+          incrementSerial(); // Incrementa correlativo tras éxito real
+          quoteItems = [];
+          calculateQuoteTotals();
+          toggleQuoteModal(false);
+        } else {
+          alert("Inconveniente reportado por la base de datos: " + (res.error || "Código Desconocido."));
+        }
+      } catch (err) {
+        console.error("Fallo de despacho web:", err);
+        alert("Error crítico de conectividad remota.");
+      } finally {
+        hideLoader();
+      }
+    }
+
+    /* 🔥 INTERCEPTOR OPTIMIZADO: Formato estructurado rígido estilo plantilla Email Corporativo */
+    function processPrintQuote() {
+      const clientName = document.getElementById('quote-client-name').value.trim();
+      const clientEmail = document.getElementById('quote-client-email').value.trim();
+
+      // Validación estricta obligatoria antes de proceder
+      if (!clientName || !clientEmail) {
+        alert("Error: No puedes generar el documento sin completar el Nombre del Cliente y el Correo de Destino.");
+        return;
+      }
+      if (quoteItems.length === 0) {
+        alert("No hay artículos que exportar a formato impreso.");
+        return;
+      }
+
+      const serialNum = getNextSerial();
+      const serialStr = `NXE-${serialNum}`;
+      const printContainer = document.getElementById('invoice-print-area');
+      const dateStr = new Date().toLocaleDateString('es-PA', { year: 'numeric', month: 'long', day: 'numeric' });
+
+      // Filas compactas usando propiedades CSS sólidas de correo electrónico en vez de clases dinámicas colapsables
+      let rowsHtml = quoteItems.map(q => {
+        const prod = dataLocal.productos.find(p => p.id === q.product_id);
+        if (!prod) return '';
+        return `
+          <tr style="border-bottom: 1px solid #e2e8f0; font-size: 13px;">
+            <td style="padding: 10px 8px 10px 0; text-align: left; vertical-align: top;">
+              <p style="margin: 0; font-weight: 700; color: #0f172a;">${prod.nombre}</p>
+              <p style="margin: 2px 0 0 0; font-size: 11px; color: #64748b; font-family: monospace;">SKU: ${prod.sku}</p>
+             </td>
+            <td style="padding: 10px 8px; text-align: center; vertical-align: top; font-family: monospace; font-weight: 500; color: #334155;">${q.quantity}</td>
+            <td style="padding: 10px 8px; text-align: right; vertical-align: top; font-family: monospace; color: #475569;">$${Number(prod.precio).toFixed(2)}</td>
+            <td style="padding: 10px 0 10px 8px; text-align: right; vertical-align: top; font-family: monospace; font-weight: 700; color: #0f172a;">$${(Number(prod.precio) * q.quantity).toFixed(2)}</td>
+           </tr>
+        `;
+      }).join('');
+
+      let subtotal = 0;
+      quoteItems.forEach(q => {
+        const prod = dataLocal.productos.find(p => p.id === q.product_id);
+        if (prod) subtotal += Number(prod.precio) * q.quantity;
+      });
+      const tax = subtotal * 0.07;
+      const total = subtotal + tax;
+
+      // Inyección encapsulada con tablas HTML rígidas (Ideal para compatibilidad exacta con Email y PDF sin desbordamientos)
+      printContainer.innerHTML = `
+        <div style="max-w: 750px; margin: 0 auto; font-family: 'Lexend', sans-serif; color: #0f172a; line-height: 1.4;">
+          
+          <!-- Bloque Cabecera Oficial (Estructura de Tabla para asegurar alineación) -->
+          <table style="width: 100%; border-collapse: collapse; border-bottom: 2px solid #e2e8f0; padding-bottom: 15px; margin-bottom: 25px;">
+            <tr>
+              <td style="text-align: left; vertical-align: middle; padding-bottom: 15px;">
+                <img src="images/logo.png" alt="Najarro X Estudio" style="height: 55px; max-height: 55px; width: auto; object-fit: contain; display: block; margin-bottom: 6px; filter: brightness(0) saturate(100%);">
+                <h1 style="font-size: 16px; margin: 0; font-weight: 800; text-transform: uppercase; tracking-tight; color: #0f172a;">Najarro X Estudio</h1>
+                <p style="font-size: 11px; margin: 1px 0 0 0; color: #64748b; font-weight: 500; letter-spacing: 0.05em; text-transform: uppercase;">Propuesta Económica Corporativa</p>
+              </td>
+              <td style="text-align: right; vertical-align: middle; padding-bottom: 15px;">
+                <h2 style="font-size: 22px; margin: 0; font-weight: 800; text-transform: uppercase; color: #0f172a; letter-spacing: -0.025em;">Cotización</h2>
+                <p style="font-size: 12px; margin: 2px 0 0 0; color: var(--accent-color); font-family: monospace; font-weight: bold;">No. ${serialStr}</p>
+                <p style="font-size: 11px; margin: 4px 0 0 0; color: #64748b; font-family: monospace;">Fecha de Emisión: ${dateStr}</p>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Datos de Cuenta y Cliente (Bloque unificado) -->
+          <table style="width: 100%; border-collapse: collapse; background-color: #f8fafc; border: 1px solid #e2e8f0; border-radius: 12px; margin-bottom: 25px;">
+            <tr>
+              <td style="padding: 14px; width: 50%; text-align: left; vertical-align: top;">
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; display: block;">Información del Solicitante:</span>
+                <p style="font-size: 13px; font-weight: 700; color: #1e293b; margin: 4px 0 1px 0;">${clientName}</p>
+                <p style="font-size: 11px; color: #64748b; margin: 0; font-family: monospace;">${clientEmail}</p>
+              </td>
+              <td style="padding: 14px; width: 50%; text-align: right; vertical-align: top;">
+                <span style="font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #94a3b8; display: block;">Generador de Propuesta:</span>
+                <p style="font-size: 13px; font-weight: 700; color: #1e293b; margin: 4px 0 1px 0;">Najarro X Estudio</p>
+                <p style="font-size: 11px; color: #64748b; margin: 0; font-family: monospace;">info@najarroxestudio.com</p>
+              </td>
+            </tr>
+          </table>
+
+          <!-- Tabla Formal de Contratación / Materiales -->
+          <table style="width: 100%; border-collapse: collapse; margin-bottom: 20px;">
+            <thead>
+              <tr style="border-bottom: 2px solid #cbd5e1; font-size: 11px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: #64748b;">
+                <th style="text-align: left; padding-bottom: 6px;">Solución Técnica / Concepto</th>
+                <th style="text-align: center; padding-bottom: 6px; width: 70px;">Cant.</th>
+                <th style="text-align: right; padding-bottom: 6px; width: 100px;">Precio Unit.</th>
+                <th style="text-align: right; padding-bottom: 6px; width: 100px;">Total</th>
+              </tr>
+            </thead>
+            <tbody>
+              ${rowsHtml}
+            </tbody>
+          </table>
+
+          <!-- Bloque Cuadrante de Cierre Financiero (Alineado perfectamente a la derecha) -->
+          <table style="width: 250px; margin-left: auto; font-size: 13px; color: #475569; border-collapse: collapse;">
+            <tr>
+              <td style="padding: 4px 0; text-align: left;">Subtotal Neto:</td>
+              <td style="text-align: right; font-family: monospace; padding: 4px 0;">$${subtotal.toFixed(2)}</td>
+            </tr>
+            <tr>
+              <td style="padding: 4px 0; text-align: left;">ITBMS Legal (7%):</td>
+              <td style="text-align: right; font-family: monospace; padding: 4px 0;">$${tax.toFixed(2)}</td>
+            </tr>
+            <tr style="font-weight: 800; color: #0f172a; font-size: 14px;">
+              <td style="padding: 8px 0 0 0; border-top: 1px solid #cbd5e1; text-align: left;">Total Estimado:</td>
+              <td style="text-align: right; padding-top: 8px; border-top: 1px solid #cbd5e1; font-family: monospace; font-size: 15px; font-weight: 800; color: #0f172a;">$${total.toFixed(2)}</td>
+            </tr>
+          </table>
+
+          <!-- Términos de Servicio y Pie de Página estilo Mail -->
+          <div style="border-top: 1px solid #e2e8f0; margin-top: 35px; padding-top: 20px; text-align: center; font-size: 11px; color: #94a3b8; line-height: 1.5;">
+            <p style="margin: 0; font-weight: 500; color: #64748b;">Gracias por su confianza en nuestro ecosistema creativo.</p>
+            <p style="margin: 2px 0 0 0;">Este presupuesto preliminar posee una vigencia estricta de 15 días calendario.</p>
+            <p style="margin: 12px 0 0 0; font-size: 9px; font-family: monospace; color: #cbd5e1;">&copy; 2026 Najarro X Estudio. Documento de Control de Autogestión Comercial.</p>
+          </div>
+
+        </div>
+      `;
+
+      // Interceptamos el título temporalmente para forzar el nombre de archivo predeterminado del PDF
+      const originalTitle = document.title;
+      const cleanClientName = clientName.replace(/[^a-z0-9]/gi, '_');
+      document.title = `Cotizacion_${cleanClientName}_${serialStr}`;
+
+      // Invoca el diálogo nativo de guardado a PDF/Impresión
+      window.print();
+
+      // Restauramos el entorno y subimos el contador correlativo
+      document.title = originalTitle;
+      incrementSerial();
+    }
+
+    function filterStoreCatalog() {
+      const searchTxt = document.getElementById('store-search').value.toLowerCase();
+      const selectedCat = document.getElementById('store-filter-category').value;
+      const selectedStock = document.getElementById('store-filter-stock').value;
+
+      const filtered = dataLocal.productos.filter(p => {
+        const matchesSearch = p.nombre.toLowerCase().includes(searchTxt) || p.sku.toLowerCase().includes(searchTxt);
+        const matchesCat = selectedCat ? p.categoria_id === selectedCat : true;
+        
+        let matchesStock = true;
+        if (selectedStock === 'in_stock') matchesStock = Number(p.stock) > 0;
+        if (selectedStock === 'low_stock') matchesStock = Number(p.stock) > 0 && Number(p.stock) <= Number(p.min_stock);
+
+        return matchesSearch && matchesCat && matchesStock;
+      });
+
+      const grid = document.getElementById('store-grid');
+      if (filtered.length === 0) {
+        grid.innerHTML = `<div class="col-span-full p-12 text-center text-muted-custom text-xs">Ningún elemento coincide con la búsqueda.</div>`;
+        return;
+      }
+
+      grid.innerHTML = filtered.map(p => {
+        const cat = dataLocal.categorias.find(c => c.id === p.categoria_id);
+        const qtyInQuote = quoteItems.find(q => q.product_id === p.id)?.quantity || 0;
+        
+        let stockBadge = `<span class="bg-emerald-500/10 text-emerald-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Disponible</span>`;
+        if (Number(p.stock) <= 0) {
+          stockBadge = `<span class="bg-rose-500/10 text-rose-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Agotado</span>`;
+        } else if (Number(p.stock) <= Number(p.min_stock)) {
+          stockBadge = `<span class="bg-amber-500/10 text-amber-400 text-[10px] px-2 py-0.5 rounded-full font-bold">Últimas Unidades</span>`;
+        }
+
+        return `
+          <div class="bento-card border rounded-2xl p-4 flex flex-col justify-between hover:shadow-md hover:border-slate-500/30 transition-all group">
+            <div class="space-y-3">
+              <div class="relative aspect-video w-full rounded-xl overflow-hidden bg-slate-900 border border-slate-700/10">
+                <img src="${p.imagen_url || 'https://images.unsplash.com/photo-1531403009284-440f080d1e12?w=400'}" alt="${p.nombre}" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-300">
+                <span class="absolute top-2 left-2 text-[9px] font-mono font-bold tracking-wider px-2 py-0.5 rounded text-white shadow-sm" style="background:${cat?.color || '#0086D6'}ee">
+                  ${cat?.nombre || 'Solución'}
+                </span>
+              </div>
+              <div>
+                <h4 class="text-sm font-heading line-clamp-2 group-hover:text-[var(--secondary-color)] transition-colors">${p.nombre}</h4>
+                <p class="text-[10px] text-muted-custom font-mono mt-0.5">SKU: ${p.sku}</p>
+              </div>
+            </div>
+            
+            <div class="mt-4 pt-3 border-t border-slate-700/10 flex flex-col gap-2">
+              <div class="flex items-center justify-between">
+                <span class="text-base font-black font-mono">$${Number(p.precio).toFixed(2)}</span>
+                <div>${stockBadge}</div>
+              </div>
+              <div class="flex items-center gap-2 mt-1">
+                <button onclick="addToQuote('${p.id}', -1)" class="bento-input border w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold hover:bg-slate-700/20 cursor-pointer select-none">-</button>
+                <input type="number" value="${qtyInQuote}" min="0" max="${p.stock}" onchange="updateQuoteInput('${p.id}', this.value)" class="bento-input border w-full h-8 rounded-lg text-center text-xs font-mono font-bold focus:outline-none">
+                <button onclick="addToQuote('${p.id}', 1)" class="bento-input border w-8 h-8 rounded-lg flex items-center justify-center text-xs font-bold hover:bg-slate-700/20 cursor-pointer select-none" ${Number(p.stock) <= 0 ? 'disabled' : ''}>+</button>
+              </div>
+            </div>
+          </div>
+        `;
+      }).join('');
+      lucide.createIcons();
+    }
+
+    function toggleThemeMode() {
+      const isLight = document.body.classList.toggle('light-mode');
+      const dot = document.getElementById('theme-toggle-dot');
+      if (isLight) {
+        dot.style.transform = 'translateX(20px)';
+        localStorage.setItem('store_theme', 'light');
+      } else {
+        dot.style.transform = 'translateX(0px)';
+        localStorage.setItem('store_theme', 'dark');
+      }
+    }
+
+    function loadSavedCustomization() {
+      const savedTheme = localStorage.getItem('store_theme');
+      const dot = document.getElementById('theme-toggle-dot');
+      if (savedTheme === 'light') {
+        document.body.classList.add('light-mode');
+        if (dot) dot.style.transform = 'translateX(20px)';
+      } else {
+        document.body.classList.remove('light-mode');
+        if (dot) dot.style.transform = 'translateX(0px)';
+      }
+    }
+  </script>
+</body>
+</html>
